@@ -52,5 +52,15 @@ If a user wants to borrow a book which it's not available. he can register in a 
 
 * `Treem`(ma_DocGia,ma_DocGia_nguoiLon) `Children`(user_ID,adult_ID_user)
 
-* `Tuasach`(ma_tuasach,tuasach,tacgia,tomtat) - 
+* `Tuasach`(ma_tuasach,tuasach,tacgia,tomtat) - `BookTitle`(book_ID, title, author, summary)
+
+* `DauSach`(isbn,ma_tuasach,ngonngu,bia,trangthai) - `BookHeader`(isbn,book_ID,language,cover,status)
+
+* `CuonSach`(isbn,ma_cuonsach,tinhtrang) - `Book`(isbn,ID,status)
+
+* `DangKy`(isbn,ma_DocGia,ngay_dk,ghichu) - `Registration`(isbn, user_ID, day, notice)
+
+* `Muon`(isbn,ma_cuonsach,ma_DocGia,ngay_muon,ngay_hethan) - `Borrow`(isbn,ID,user_ID,validday,invalidday)
+
+* `QuaTrinhMuon`(isbn, ma_cuonsach, ngay_muon, ma_DocGia, ngay_hethan, ngay_tra, tien_muon, tien_datra, tien_datcoc, ghichu) - `BorrowProcess`(isbn, ID, day, user_ID, validday, invalidday, price, money1, money2 , notice )
 

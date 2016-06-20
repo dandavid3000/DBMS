@@ -6,7 +6,7 @@
 3. [Database Diagram](database-diagram)
 4. [Source code](#source-code)
 
-
+---
 ### Requirements
 #### Description
 A library needs to manage users who can register, borrow, and return books.
@@ -36,6 +36,8 @@ If a user wants to borrow a book which it's not available. he can register in a 
 4. The average time of borrows?
 5. When are there the most users?
 
+---
+
 #### Rules
 1. Book ID, and No start from 1. When a book is added, check `No`, if it's available then insert into this slot.
 2. UserID is similar to 1.
@@ -44,6 +46,8 @@ If a user wants to borrow a book which it's not available. he can register in a 
 5. Children are allowed to borrow only 1 book.
 6. Adult's books + Children's book <= 5
 7. If users want to borrow books that do not exist in the library, they need to register.
+
+---
 
 #### Database diagram
 * `DocGia`(ma_DocGia,ho,tenlot,ten,ngaysinh) - `User`(user_ID,lastname,middlename,firstname,dob)
