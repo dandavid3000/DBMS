@@ -92,8 +92,40 @@ Set-up store procedure for the library DB
 ##### List all adults who are borrowing books
 
 * name: `sp_ThongtinNguoiLonDangmuon`
-* 
+* content: List all information
 
+##### List all adult readers who are in invalid status
 
+* name: `sp_ThongtinNguoiLonQuahan`
+* content: List all information of those who borrowed books over 14 days.
 
+##### List all adult readers, and their children who are borrowing
+
+* name: `sp_DocGiaCoTreEmMuon`
+* content: List all adult readers who are borrowing, and their children also are borrowing books.
+
+##### Update book headers
+
+* name: `sp_CapnhatTrangthaiDausach`
+* content: Check status of a book header by using its isbn. If the book is not available then the status is `N`, and `Y` for available status.
+
+##### Add a new book title
+
+* name: sp_ThemTuaSach
+* content: Add a new book title into the system when 3 attributes including `BookTitle`, `Author` and `Content` are different from records in the DB.
+
+##### Add a new book
+
+* name: sp_ThemCuonSach
+* content: Add a new book into the system. The status of book title must be updated
+
+#### Add a new adult 
+
+* name: `sp_ThemNguoiLon`
+* content: Add new information into `Adult` and `User` tables of the system.
+
+#### Add a new child
+
+* name: `sp_ThemTreEm`
+* content: Add a new information into `Children` and `User` tables of the system.
 
