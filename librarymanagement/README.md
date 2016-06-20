@@ -4,7 +4,7 @@
 1. [Requirements](#requirements)
 2. [Rules](#rules)
 3. [Database Diagram](database-diagram)
-4. [Source code](#source-code)
+4. [Store procedure requirements](#store-procedure-requirements)
 
 ---
 ### Requirements
