@@ -6,7 +6,7 @@
 3. [Database Diagram](database-diagram)
 4. [Source code](#source-code)
 
-
+---
 ### Requirements
 #### Description
 A library needs to manage users who can register, borrow, and return books.
@@ -36,6 +36,8 @@ If a user wants to borrow a book which it's not available. he can register in a 
 4. The average time of borrows?
 5. When are there the most users?
 
+---
+
 #### Rules
 1. Book ID, and No start from 1. When a book is added, check `No`, if it's available then insert into this slot.
 2. UserID is similar to 1.
@@ -45,7 +47,12 @@ If a user wants to borrow a book which it's not available. he can register in a 
 6. Adult's books + Children's book <= 5
 7. If users want to borrow books that do not exist in the library, they need to register.
 
+---
+
 #### Database diagram
+
+* Please find [here](src/libraryscript.sql) the script for this library
+
 * `DocGia`(ma_DocGia,ho,tenlot,ten,ngaysinh) - `User`(user_ID,lastname,middlename,firstname,dob)
 
 * `NguoiLon`(ma_DocGia,sonha,duong,quan,dienthoai,han_sd) - `Adult`(user_ID,housenumber,street,district,phonenumber,validday)
@@ -63,4 +70,30 @@ If a user wants to borrow a book which it's not available. he can register in a 
 * `Muon`(isbn,ma_cuonsach,ma_DocGia,ngay_muon,ngay_hethan) - `Borrow`(isbn,ID,user_ID,validday,invalidday)
 
 * `QuaTrinhMuon`(isbn, ma_cuonsach, ngay_muon, ma_DocGia, ngay_hethan, ngay_tra, tien_muon, tien_datra, tien_datcoc, ghichu) - `BorrowProcess`(isbn, ID, day, user_ID, validday, invalidday, price, money1, money2 , notice )
+
+![DB diagram(../images/dbdiagram.png "DB diagram")
+
+--- 
+
+#### Store Procedure requirements
+
+Set-up store procedure for the library DB
+
+##### Readers' retrieving 
+
+* name: `sp_ThongtinDocGia`
+* content: List all information of users using user ID. If the user is an adult, show the information in the table `Adult`. It's similar for children.
+
+##### Information of Book Headers
+
+* name: `sp_ThongTinDauSach`
+* content: List all information of Book Headers, Book titles, and the number of available books (ISBN)
+
+##### List all adults who are borrowing books
+
+* name: `sp_ThongtinNguoiLonDangmuon`
+* 
+
+
+
 
