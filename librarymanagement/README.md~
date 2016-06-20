@@ -71,7 +71,7 @@ If a user wants to borrow a book which it's not available. he can register in a 
 
 * `QuaTrinhMuon`(isbn, ma_cuonsach, ngay_muon, ma_DocGia, ngay_hethan, ngay_tra, tien_muon, tien_datra, tien_datcoc, ghichu) - `BorrowProcess`(isbn, ID, day, user_ID, validday, invalidday, price, money1, money2 , notice )
 
-![DB diagram(../images/dbdiagram.png "DB diagram")
+![DB diagram](../images/dbdiagram.png "DB diagram")
 
 --- 
 
@@ -111,12 +111,12 @@ Set-up store procedure for the library DB
 
 ##### Add a new book title
 
-* name: sp_ThemTuaSach
+* name: `sp_ThemTuaSach`
 * content: Add a new book title into the system when 3 attributes including `BookTitle`, `Author` and `Content` are different from records in the DB.
 
 ##### Add a new book
 
-* name: sp_ThemCuonSach
+* name: `sp_ThemCuonSach`
 * content: Add a new book into the system. The status of book title must be updated
 
 #### Add a new adult 

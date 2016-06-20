@@ -77,7 +77,7 @@ If a user wants to borrow a book which it's not available. he can register in a 
 
 #### Store Procedure requirements
 
-Set-up store procedure for the library DB
+Set-up store procedure for the library DB. Please check the source code [here](src/sp.sql).
 
 ##### Readers' retrieving 
 
