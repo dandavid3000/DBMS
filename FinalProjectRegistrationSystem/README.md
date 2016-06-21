@@ -627,7 +627,7 @@ Build store procedures to perform requirements.
 	* `T2 : exec sp_ XemThongTinDangKyDoAn 1`
 
 
-* A student wants to unregister project 1. He waits for the system to verify. In the meantime, there is a teacher who wants to retrieve the information, and get the trash information because the student's about to unregister that project.
+* A student wants to unregister project 1. He waits for the system to verify. In the meantime, there is a teacher who wants to retrieve the information, and gets the trash information because the student's about to unregister that project.
 
 * Solution: Make sure T1 is finished, then T2 will be able to read the information.
 	* Use `XLOCK` for `PROJECT` table
