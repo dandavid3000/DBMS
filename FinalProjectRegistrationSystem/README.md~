@@ -132,11 +132,11 @@ Check the script [here](src/dbscript.sql) for this database
 	![DB design](../images/dbdesign.jpg "DB design")
 
 
-##### Store Procedure
+##### Store Procedures
 
 Build store procedures to perform requirements.
 
-* `sp_GVUpdateDA`
+* `sp_GVUpdateDA` [Code](src/sp_GVUpdateDA.sql)
 	* *Purpose*: A teacher wants to update old projects
 	* *Variables*:
 		* `@Ma_DA` *int* : Projet ID
@@ -151,16 +151,15 @@ Build store procedures to perform requirements.
 	* *Process*:
 		* Check the project
 			* See if the project exists or not? If not shows errors, and quit.
-			* Check the maximum group number
+			* Check the maximum group number.
 		* If it satisfies
 			* Check max teacher number > reponsible teacher number
 				* If it satisfies, then update new information
 				* Else show errors.
 		* If it doesn't satisfy, show errors
 
-	* [Code](src/sp_GVUpdateDA.sql)
 
-* `sp_SVDangKyDA`
+* `sp_SVDangKyDA` [Code](src/sp_SVDangKyDA.sql)
 	* *Purpose*: Students want to update old projects
 	* *Variables*:
 		* `@Ma_DA` *int* : Projet ID
@@ -170,12 +169,111 @@ Build store procedures to perform requirements.
 		* Check the project
 			* See if the project exists or not? If not shows errors, and quit.
 			* Check if the group registered or not. If yes, show errors and quit.
-		* Check if the project is able to register
-			* Check the deadline
-			* Check max group number
+		* Check if the project is able to register.
+			* Check the deadline.
+			* Check max group number.
 		* Check if the group exists or not.
 		* Register the project.
 
-	* [Code]()
 
+* `sp_GVDocSuaDoAn` [Code](src/sp_GVDocSuaDoAn.sql)
+	* *Purpose*: Teachers retrieve information of the project, and update it.
+	* *Variables*:
+		* `@Ma_DA` *int* : Projet ID
+		* `@TenDoAn` *nvarchar(50)* : Project name
+		* `@dead_Lone` *datatime* : Deadline
+		* `@yeu_cau` *nvarchar(50)* : Project requirements
+		* `@MaHT` *int* : Type ID
+		* `@SoLuongNhomToiDa` *int* : Max group number
+		* `@SoLuongNhomToiDaDangKy` *int* : Number of group who registered projects
+		* `@SoLuongGiaoVienToiDa` *int* : Max teacher number
+		* `@SoLuongGiaoDaVienPhuTrach` *int* : Reponsible teacher number
+	* *Process*:
+		* Check the project. If it doesn't exist then quit.
+		* Read, and update the project.
+			* Extract Project table.
+			* Check the requirement update.
+			* Update the project.
+		* Read again the project.
 
+* `sp_XemThongTinDangKyDoAn` [Code](src/sp_XemThongTinDangKyDoAn.sql)
+	* *Purpose*: Retrieve information of projects
+	* *Variables*:
+		* `@Ma_DA` *int* : Projet ID
+	* *Process*:
+		* Show information
+
+* `sp_SVHuyDangKyDA` [Code](src/sp_SVHuyDangKyDA.sql)
+	* *Purpose*: Students withdraw registered projects.
+	* *Variables*:
+		* `@Ma_DA` *int* : Projet ID
+		* `@Ma_Nhom` *int* : Group ID
+	* *Process*:
+		* Check if the project exists.
+		* Check if the group registered the project or not?
+		* Check the deadline.
+		* Unregister the project
+			* Update the number of group.
+			* Delete information in `PROJECTREGISTRATION` table.
+
+* `sp_GVThemDoAn` [Code](src/sp_GVThemDoAn.sql)
+	* *Purpose*: Teachers add a new project.
+	* *Variables*:
+		* `@Ma_DA` *int* : Projet ID
+		* `@TenDoAn` *nvarchar(50)* : Project name
+		* `@dead_Lone` *datatime* : Deadline
+		* `@yeu_cau` *nvarchar(50)* : Project requirements
+		* `@MaHT` *int* : Type ID
+		* `@SoLuongNhomToiDa` *int* : Max group number
+		* `@SoLuongNhomToiDaDangKy` *int* : Number of group who registered projects
+		* `@SoLuongGiaoVienToiDa` *int* : Max teacher number
+		* `@SoLuongGiaoDaVienPhuTrach` *int* : Reponsible teacher number
+	* *Process*:
+		* Check if the project exists?
+		* Check if the input is correct?
+		* Insert a new record in the `PROJECT` table.
+
+* `sp_SVDangKyNhom` [Code](src/sp_SVDangKyNhom.sql)
+	* *Purpose*: Students withdraw registered projects.
+	* *Variables*:
+		* `@TenNhom` *nvarchar(50)* : Group name
+		* `@SoLuongSV` *int* : Number of members in the group
+		* `@MaNhomTruong` *int* : Group leader ID
+	* *Process*:
+		* Check if the group registered?
+		* Check if the group leader id exists, and the input data?
+		* Insert a new record in `GROUP` table.
+
+* `sp_SVDocDoAn` [Code](src/sp_SVDocDoAn.sql)
+	* *Purpose*: Student reads information of the project and print it out.
+	* *Variables*:
+		* `@Ma_DA` *int* : Projet ID
+	* *Process*:
+		* Check if the project exists?
+		* Read information
+			* Print out the project existence.
+			* Print out max group number, and registration group number.
+
+* `sp_GVHuyDoAn` [Code](src/sp_GVHuyDoAn.sql)
+	* *Purpose*: Teachers want to withdraw a project.
+	* *Variables*:
+		* `@Ma_DA` *int* : Projet ID
+	* *Process*:
+		* Check if the project exists?
+		* Withdraw the project
+			* Delete information from `PROJECTDETAIL` table
+			* Delete information from `PROJCETREGISTRATION` table
+			* Delete information from `PROJECT` table
+
+* `sp_DangKyPhuTrach` [Code](src/sp_DangKyPhuTrach.sql)
+	* *Purpose*: Teachers want to withdraw a project.
+	* *Variables*:
+		* `@Ma_DA` *int* : Projet ID
+		* `@Ma_GV` *int* : Teacher ID
+	* *Process*:
+		* Check if the project exists?
+		* Check if the project has teachers who are responsible for?
+		* Check if this teacher exists?
+		* Teacher registration.
+
+##### Store Procedures
