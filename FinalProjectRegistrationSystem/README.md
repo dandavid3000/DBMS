@@ -287,7 +287,7 @@ Build store procedures to perform requirements.
 |**(3)** Extract information | |
 
 * Assumption: **(1)** -> **(2)** -> **(3)**
-* T1 will give different information if he reads twice (Cannot read the information again
+* T1 will give different information if he reads twice (Cannot read the information again)
 	* `T1 : exec sp_SVDocDoAn 1`
 	* `T2 : exec sp_GVHuyDoAn 1`
 * The student is noticed the project existence, and wait for a while. After that, the student receives nothing because the project is deleted by a teacher.
@@ -302,7 +302,7 @@ Build store procedures to perform requirements.
 	set tran isolation level REPEATABLE READ
 		if(exists (select * from DoAn DA where DA.MaDoAn=@Ma_DA))
 		begin
-			print 'Do an co ton tai, xin doi trong giay lat'
+			print 'Project exists, please wait !'
 			waitfor delay '00:00:05'
 			select DA.SoLuongNhomToiDa, DA.SoLuongNhomDaDangKy from DoAn DA where DA.MaDoAn = @Ma_DA
 		end
@@ -310,3 +310,47 @@ Build store procedures to perform requirements.
 	commit tran
 	end
 	```
+
+##### Scenario 2
+
+| T1 - Project information update | T2 - Project registration |
+| :-------------: |:-------------:|
+|**(1)** A teacher modifies project information     |  | 
+| Waitfor delay ‘00:00:05’   |   |
+| | **(2)** A student reads new information   |
+| | **(3)** The student registers project succesfully |
+|**(4)** The transaction encounters errors, and is rollbacked | |
+
+* Assumption: **(1)** -> **(2)** -> **(3)** -> **(4)**
+	* `T1 : exec sp_GVUpdateDA 1`
+	* `T2 : exec sp_SVDangKyDA 1`
+
+* A teacher wants to modify information of a project. A student interferes to register. Teacher's transaction has errors and rollbacks. The student read the incorrect information from the teacher.
+* Solution: Make sure that T1 is finished, then T2 will be processed.
+
+	```
+	alter proc sp_GVUpdateDA 
+	@Ma_DA int ,@TenDoAn nvarchar(50),@dead_Line datetime , @yeu_cau nvarchar(50),@MaHT int,@SoLuongNhomToiDa int,@SoLuongNhomDaDangKy int,@SoLuongGiaoVienToiDa int ,@SoLuongGiaoVienDaPhuTrach int 
+	as begin
+	begin tran 
+		set tran isolation level READ COMMITTED
+		if(not exists (select * from DoAn as DA where DA.MaDoAn=@Ma_DA)) 
+		begin
+			print 'Khong co do an nay'
+	rollback
+			return
+		end
+		if( @SoLuongNhomToiDa - (select DA.SoLuongNhomDaDangKy from DoAn As DA where DA.MaDoAn=@Ma_DA ) >= 0 )
+		begin
+			if( @SoLuongGiaoVienToiDa - (select DA.SoLuongGiaoVienDaPhuTrach from DoAn As DA where DA.MaDoAn=@Ma_DA ) >= 0 )
+				update DoAn set TenDoAn=@TenDoAn,DeadLine=@dead_Line,YeuCau=@yeu_cau,MaHT=@MaHT,SoLuongNhomToiDa= @SoLuongNhomToiDa,SoLuongNhomDaDangKy=@SoLuongNhomDaDangKy,SoLuongGiaoVienToiDa=@SoLuongGiaoVienToiDa,SoLuongGiaoVienDaPhuTrach=@SoLuongGiaoVienDaPhuTrach where(DoAn.MaDoAn=@Ma_DA)		
+			else print 'Ko update duoc so luong giao vien toi da moi nho hon so luong giao vien da phu trach'
+		end
+		else print 'Ko update duoc so nhom toi da moi nho hon so luong nhom da dang ky'
+
+		select * from DoAn As DA where DA.MaDoAn=@Ma_DA 
+	commit
+	end
+	```
+
+
