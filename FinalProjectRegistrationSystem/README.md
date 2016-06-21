@@ -286,7 +286,27 @@ Build store procedures to perform requirements.
 | Waitfor delay ‘00:00:05’   | **(2)** Teacher withraws the project     |
 |**(3)** Extract information | |
 
-| Assumption: **(1)** -> **(2)** -> **(3)** |
-| T1 will give different information if he reads twice (Cannot read the information again |
+* Assumption: **(1)** -> **(2)** -> **(3)**
+* T1 will give different information if he reads twice (Cannot read the information again
+	* `T1 : exec sp_SVDocDoAn 1`
+	* `T2 : exec sp_GVHuyDoAn 1`
+* The student is noticed the project existence, and wait for a while. After that, the student receives nothing because the project is deleted by a teacher.
 
+* Solution: Use `isolation level REPEATABLE READ`
 
+	```sql
+	alter proc sp_SVDocDoAn
+	@Ma_DA int
+	as begin
+	begin tran
+	set tran isolation level REPEATABLE READ
+		if(exists (select * from DoAn DA where DA.MaDoAn=@Ma_DA))
+		begin
+			print 'Do an co ton tai, xin doi trong giay lat'
+			waitfor delay '00:00:05'
+			select DA.SoLuongNhomToiDa, DA.SoLuongNhomDaDangKy from DoAn DA where DA.MaDoAn = @Ma_DA
+		end
+		else print 'Do an ko ton tai'
+	commit tran
+	end
+	```
