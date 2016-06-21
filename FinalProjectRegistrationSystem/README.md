@@ -137,7 +137,7 @@ Check the script [here](src/dbscript.sql) for this database
 Build store procedures to perform requirements.
 
 * `sp_GVUpdateDA`
-	* *Purpose*: Teacher wants to update old projects
+	* *Purpose*: A teacher wants to update old projects
 	* *Variables*:
 		* `@Ma_DA` *int* : Projet ID
 		* `@TenDoAn` *nvarchar(50)* : Project name
@@ -150,36 +150,32 @@ Build store procedures to perform requirements.
 		* `@SoLuongGiaoDaVienPhuTrach` *int* : Reponsible teacher number
 	* *Process*:
 		* Check the project
-			* See if the project exists or not, if not shows errors, and quit.
+			* See if the project exists or not? If not shows errors, and quit.
 			* Check the maximum group number
 		* If it satisfies
 			* Check max teacher number > reponsible teacher number
 				* If it satisfies, then update new information
 				* Else show errors.
-		* IF it doesn't satisfy, show errors
+		* If it doesn't satisfy, show errors
 
-	* *Code* 
+	* [Code](src/sp_GVUpdateDA.sql)
 
-		```sql 
-		create proc sp_GVUpdateDA 
-		@Ma_DA int ,@TenDoAn nvarchar(50),@dead_Line datetime , @yeu_cau nvarchar(50),@MaHT int,@SoLuongNhomToiDa int,@SoLuongNhomDaDangKy int,@SoLuongGiaoVienToiDa int ,@SoLuongGiaoVienDaPhuTrach int 
-		as begin
-		begin tran 
-			if(not exists (select * from DoAn as DA where DA.MaDoAn=@Ma_DA)) 
-			begin
-				print 'Khong co do an nay'
-		rollback
-				return
-			end
-			if( @SoLuongNhomToiDa - (select DA.SoLuongNhomDaDangKy from DoAn As DA where DA.MaDoAn=@Ma_DA ) >= 0 )
-			begin
-				if( @SoLuongGiaoVienToiDa - (select DA.SoLuongGiaoVienDaPhuTrach from DoAn As DA where DA.MaDoAn=@Ma_DA ) >= 0 )
-					update DoAn set TenDoAn=@TenDoAn,DeadLine=@dead_Line,YeuCau=@yeu_cau,MaHT=@MaHT,SoLuongNhomToiDa= @SoLuongNhomToiDa,SoLuongNhomDaDangKy=@SoLuongNhomDaDangKy,SoLuongGiaoVienToiDa=@SoLuongGiaoVienToiDa,SoLuongGiaoVienDaPhuTrach=@SoLuongGiaoVienDaPhuTrach where(DoAn.MaDoAn=@Ma_DA)		
-				else print 'Ko update duoc so luong giao vien toi da moi nho hon so luong giao vien da phu trach'
-			end
-			else print 'Ko update duoc so nhom toi da moi nho hon so luong nhom da dang ky'
+* `sp_SVDangKyDA`
+	* *Purpose*: Students want to update old projects
+	* *Variables*:
+		* `@Ma_DA` *int* : Projet ID
+		* `@Ma_Nhom` *int* : Group ID
+		* `@NgayDangKy` *datatime* : Registration day
+	* *Process*:
+		* Check the project
+			* See if the project exists or not? If not shows errors, and quit.
+			* Check if the group registered or not. If yes, show errors and quit.
+		* Check if the project is able to register
+			* Check the deadline
+			* Check max group number
+		* Check if the group exists or not.
+		* Register the project.
 
-			select * from DoAn As DA where DA.MaDoAn=@Ma_DA 
-		commit
-		end
-		```
+	* [Code](src/sp_SVDangKyDA.sql)
+
+
