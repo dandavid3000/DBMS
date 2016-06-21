@@ -9,14 +9,14 @@
 ---
 
 ### Requirements
-##### Introduction
+#### Introduction
 * The system has those features
 	* Allow teachers to register projects (Personal or Group of student)
 	* Teachers can give extra exercises for points, and there is a limit number of student for that.
 	* Allow students to join any group, or project
 	* Allow leader of a group register their project
 
-##### Rules
+#### Rules
 
 * Everytime teachers register projects, they have permissions to give extra assignments to help students get points. There is a limit of number students who register.
 * Teachers decide this number of students.
@@ -24,23 +24,23 @@
 * After a deadline, students cannot register theis groups.
 * Teachers can extend deadlines.
 
-##### Features
+#### Features
 
-###### Teachers
+##### Teachers
 * Give assignments
 * Read information his projects, assignments.
 * Update status of projects/assignments: deadline, maximum member number, mamximum group number...
 
-###### Students
+##### Students
 * Group registration.
 * Allow to register or withdraw projects.
 * Move to another group / Ungroup.
 
-###### Administration
+##### Administration
 * User creations
 * Enable/Unenable projects.
 
-###### Others
+##### Others
 * Login/logout features.
 * Add, delete, modify, update projects
 ...
@@ -49,14 +49,14 @@
 
 ### Deployed System
 
-##### Features 
+#### Features 
 
 * Allow teachers to register projects `(add, delete, upgrade their projects)` with constrains `(group project, personal, max number...)`.
 * Allow practical teachers to register his assistant.
 * Allow students to register projects, withdraw projects with personal projects.
 * Allow group leader to register projects, groups, and withdraw projects or groups.
 
-##### Database design
+#### Database design
 
 Check the script [here](src/dbscript.sql) for this database 
 
@@ -132,7 +132,7 @@ Check the script [here](src/dbscript.sql) for this database
 	![DB design](../images/dbdesign.jpg "DB design")
 
 
-##### Store Procedures
+#### Store Procedures
 
 Build store procedures to perform requirements.
 
@@ -276,4 +276,14 @@ Build store procedures to perform requirements.
 		* Check if this teacher exists?
 		* Teacher registration.
 
-##### Store Procedures
+#### Transaction conflicts and Deadlocks
+
+##### Scenario 1
+
+| T1 - Student reads project information | T2 - Teacher withraws a project |
+| ------------- |-------------:|
+| col 3 is      | right-aligned | 
+| col 2 is      | centered      |
+
+
+
