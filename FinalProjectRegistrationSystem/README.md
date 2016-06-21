@@ -326,7 +326,7 @@ Build store procedures to perform requirements.
 	* `T2 : exec sp_SVDangKyDA 1`
 
 * A teacher wants to modify information of a project. A student interferes to register. Teacher's transaction has errors and rollbacks. The student read the incorrect information from the teacher.
-* Solution: Make sure that T1 is finished, then T2 will be processed.
+* Solution: Make sure that T1 is finished, then T2 will be processed. Use `isolation level READ COMMITTED`.
 
 	```
 	alter proc sp_GVUpdateDA 
@@ -352,5 +352,51 @@ Build store procedures to perform requirements.
 	commit
 	end
 	```
+
+##### Scenario 3
+
+| T1 - Project information update | T2 - Project information update |
+| :-------------: |:-------------:|
+|**(1)** A teacher reads project information     |  | 
+| Waitfor delay ‘00:00:10’   |   |
+| | **(2)** Another teacher reads project information      |
+| | Waitfor delay ‘00:00:10’  |
+|**(3)** Modifies information of project||
+| |**(4)** Modifies information of project|
+|**(5)** Teacher reads again updated information | |
+
+* Assumption: **(1)** -> **(2)** -> **(3)** -> **(4)** -> **(5)**
+* The information from T1 is overwritten by T2 (Cannot read information again)
+	* `T1 : exec sp_GVDocSuaDoAn 1,'abc','2/2/2010','abc',1,2,1,5,4`
+	* `T2 : exec sp_GVDocSuaDoAn 1,'abcsctẽts','2/2/2010','abc',1,2,1,5,4`
+* Teacher 1 reads information of a project, and waits for 10 seconds. After that he modies the project but when he reads again the information, it's totally different. Teacher T2 interferes T1.
+* Solution: Make sure that T1 is completed, then T2 will be executed. 
+
+	```
+	alter proc sp_GVDocSuaDoAn
+	@Ma_DA int ,@TenDoAn nvarchar(50),@dead_Line datetime , @yeu_cau nvarchar(50),@MaHT int,@SoLuongNhomToiDa int,@SoLuongNhomDaDangKy int,@SoLuongGiaoVienToiDa int ,@SoLuongGiaoVienDaPhuTrach int 
+
+	as begin
+	begin tran
+		set tran isolation level REPEATABLE READ
+		if(exists (select * from DoAn DA where DA.MaDoAn=@Ma_DA))
+		begin	
+			select* from DoAn DA where DA.MaDoAn = @Ma_DA
+			waitfor delay '00:00:10'
+	
+			if( @SoLuongNhomToiDa - (select DA.SoLuongNhomDaDangKy from DoAn As DA where DA.MaDoAn=@Ma_DA ) >= 0 )
+				begin
+					if( @SoLuongGiaoVienToiDa - (select DA.SoLuongGiaoVienDaPhuTrach from DoAn As DA where DA.MaDoAn=@Ma_DA ) >= 0 )
+						update DoAn set TenDoAn=@TenDoAn,DeadLine=@dead_Line,YeuCau=@yeu_cau,MaHT=@MaHT,SoLuongNhomToiDa= @SoLuongNhomToiDa,SoLuongNhomDaDangKy=@SoLuongNhomDaDangKy,SoLuongGiaoVienToiDa=@SoLuongGiaoVienToiDa,SoLuongGiaoVienDaPhuTrach=@SoLuongGiaoVienDaPhuTrach where(DoAn.MaDoAn=@Ma_DA)		
+					else print 'Ko update duoc so luong giao vien toi da moi nho hon so luong giao vien da phu trach'
+				end
+			else print 'Ko update duoc so nhom toi da moi nho hon so luong nhom da dang ky'
+		end
+		select* from DoAn DA where DA.MaDoAn = @Ma_DA
+
+	commit
+	end
+	```
+
 
 
