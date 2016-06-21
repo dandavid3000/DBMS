@@ -10,7 +10,6 @@
 		* [Administration](#administration)
 		* [Others](#others)
 
-	
 2. [Deployed System](#deployed-system)
 	* [Features](#features)
 	* [Database design](#database-design)
@@ -24,6 +23,8 @@
 		* [Scenario 6](#scenario-6)
 		* [Scenario 7](#scenario-7)
 		* [Scenario 8](#scenario-8)
+		* [Scenario 9](#scenario-9)
+
 ---
 
 ### Requirements
@@ -480,7 +481,6 @@ Build store procedures to perform requirements.
 	* Use `isolation level SERIALIZABLE`
 	
 	```
-
 	alter proc sp_SVDangKyDA
 	@Ma_DA int ,@Ma_Nhom int ,@NgayDangKy datetime
 	as 
@@ -543,14 +543,176 @@ Build store procedures to perform requirements.
 	 
 	end
 	commit 
-
 	```
 
 ##### Scenario 6
 
+| T1 - Project registration| T2 - Project registration|
+| :-------------: |:-------------:|
+|**(1)** Reads `PROJECT` table to check the max number    |  | 
+| Waitfor delay ‘00:00:05’   |     |
+| | **(2)** Registers the same project |
+|**(3)** Registers the current project | |
+
+* Assumption: **(1)** -> **(2)** -> **(3)**
+* The result of registration may be wrong because there are 2 transactions writing the data (Phantom)
+	* `T1 : exec sp_DangKyPhuTrach 1,2`
+	* `T2 : exec sp_DangKyPhuTrach 1,3`
+
+* Teacher 2, and teacher 3 want to register to assist project 1. There is only one slot left. This leads to the final result that there is 3 teachers registered this project. This is wrong ! (It should be 2 only)
+* Solution: Make sure T1 is finished, then T2 will be executed (T2 will not be able to register because max is 2 teachers)
+	* Use `isolation level SERIALIZABLE`
+
+	```
+	alter proc sp_DangKyPhuTrach
+	@Ma_DA int ,@Ma_GV int
+	as 
+	begin 
+	begin tran
+	set tran isolation level SERIALIZABLE
+		--buoc 1 : kiem tra do an co ton tai ko
+		if(not exists (select * from DoAn as DA where DA.MaDoAn=@Ma_DA))
+		begin	
+			print N'Do an ko ton tai'
+			rollback
+			return
+		end
+
+		-- Neu Do an ton tai
+		--Kiem tra do an nay cho con duoc phep dang ky phu trach khong
+		if( (select DA.SoLuongGiaoVienToiDa - DA.SoLuongGiaoVienDaPhuTrach from DoAn As DA where DA.MaDoAn=@Ma_DA ) < 1 )
+		begin
+			print N'Do an da du giao vien phu trach.'
+			rollback 
+			return
+		end
+		--return
+	--buoc 2: Kiem tra giao vien co ton tai ko
+		if(not exists (select * from GiaoVien  as N where N.MaGiaoVien=@Ma_GV))
+			begin
+				print N'Giao vien nay khong ton tai.'
+				rollback
+				return	
+			end
+
+		--Neu giao vien ton tai
+	  waitfor delay '00:00:10'
+
+	--buoc 3: Tien hanh dang ky phu trach do an
+		declare @Ma_DK as int 
+		set @Ma_DK=1
+		while(exists (select * from ChiTietDoAn as CTDA where CTDA.MaCTDA=@Ma_DK))
+			set @Ma_DK=@Ma_DK+1
+	if(not exists (select * from ChiTietDoAn as CTDA where CTDA.MaDoAn=@Ma_DA and CTDA.MaGiaoVien=@Ma_GV))
+	begin
+		insert into ChiTietDoAn values(@Ma_DK,@Ma_DA,@Ma_GV)
+		update DoAn  set DoAn.SoLuongGiaoVienDaPhuTrach=DoAn.SoLuongGiaoVienDaPhuTrach+1 where DoAn.MaDoAn=@Ma_DA
+	end
+	commit 
+	end
+	```
+
 ##### Scenario 7
 
-##### Scenario 8
+| T1 - Project withdraw | T2 - Teachers read information|
+| :-------------: |:-------------:|
+|**(1)**  A student check if he registered a projectr    |  | 
+| Waitfor delay ‘00:00:05’   |     |
+| | **(2)** Reads information of registered project|
+|**(3)** Withdraws a project| |
+
+* Assumption: **(1)** -> **(2)** -> **(3)**
+* T1 is unregistering, but T2 interferes and read wrong information (Trash information)
+	* `T1 : exec sp_ SVHuyDangKyDA 1,1`
+	* `T2 : exec sp_ XemThongTinDangKyDoAn 1`
+
+
+* A student wants to unregister project 1. He waits for the system to verify. In the meantime, there is a teacher who wants to retrieve the information, and get the trash information because the student's about to unregister that project.
+
+* Solution: Make sure T1 is finished, then T2 will be able to read the information.
+	* Use `XLOCK` for `PROJECT` table
+
+	```
+	alter proc sp_SVHuyDangKyDA
+	@Ma_DA int ,@Ma_Nhom int 
+	as 
+	begin tran
+	begin 
+
+		 --buoc 1 : kiem tra do an co ton tai ko
+		 if(not exists (select * from DangKiDoAn with (XLOCK) where DangKiDoAn.MaDoAn=@Ma_DA and DangKiDoAn.MaNhom=@Ma_Nhom))
+		 begin 
+			  print N'Nhóm chưa đăng ký đồ án này.'
+			  rollback
+			  return
+		 end
+
+
+		 --waitfor delay '00:00:30'
+		 -- Neu Do an ton tai
+		  waitfor delay '00:00:10'
+		 
+		--Buoc 2 : Kiem tra xem co dang ky hay chua
+
+		-- Buoc 3 : Phải trước deadline mới đc hủy đăng ký
+
+		--buoc 4: Tien hanh huy dang ky do an
+		 update DoAn  set DoAn.SoLuongNhomDaDangKy=DoAn.SoLuongNhomDaDangKy-1 where DoAn.MaDoAn = @Ma_DA
+		 delete from DangKiDoAn where MaDoAn = @Ma_DA and MaNhom=@Ma_Nhom
+	 
+	end
+	commit
+	```
+
+##### Scenario 8 
+
+`DeadLock`
+
+| T1 - Project registration| T2 - Project unregistration|
+| :-------------: |:-------------:|
+|**(1)** Register a project (Write A)    |  | 
+| Waitfor delay ‘00:00:05’   |     |
+| | **(2)** Update registered group number in `PROJECT` table (Write B) |
+|**(3)** Update registered group number after **(1)** (Write B) | |
+||**(4)** Delete the project `PROJCETREGISTRATION` table|
+||(Write A)|
+
+* Assumption: **(1)** -> **(2)** -> **(3)** -> **4**
+* Transaction T1 and T2 will wait for each other to finish `(Cycle Deadlock)`.
+	* `T1 : exec sp_ SVDangKyDA 1,1,2/2/2010`
+	* `T2 : exec sp_ SVHuyDangKyDoAn 1,2`
+	* Student 1 wants to register project 1 -> He holds locks in `PROJECT` and `GROUP` tables
+	* Student 2 wants to unregister project 1 -> He holds locks in `GROUP` and `PROJECT` tables
+
+* Solution: SQL will eliminate one lock to prevent the deadlock
+
+##### Scenario 9
+
+`DeadLock`
+
+| T1 - Change max number of teachers in a project| T2 - Change max group number in a project|
+| :------------- |:-------------|
+|Begin tran   |  | 
+|SET  TRAN ISOLATION LEVEL ||
+|SERIALIZABLE ||
+|**(1)** Read max teacher number. (Read A)||
+| Waitfor delay ‘00:00:05’   |     |
+||Begin tran |
+||SET  TRAN ISOLATION LEVEL |
+||SERIALIZABLE  |
+||**(2)** Read max group number in a project. (Read A)|
+|**(3)** Change the max teacher number (Write A) ||
+||**(4)** Change max group number in a project (Write A) | 
+
+* Assumption: **(1)** -> **(2)** -> **(3)** -> **4**
+* Transaction T1 and T2 will wait for each other to finish `(Conversion Deadlock)`.
+	* `
+T1 : exec sp_ GVUpdateDA 1,N'Store procedure','9/27/2010',N'nộp đúng quy định',1,1,1,2,1`
+	* `T2 : exec sp_ GVUpdateDA 1,N'Store procedure','9/27/2010',N'nộp đúng quy định',1,2,1,2,1`
+	* Teacher 1 wants to change the max teacher number for a project -> He holds write, and read locks in `PROJECT` table.
+	* Teacher 2 wants to change the max group number for the same project -> He holds write, and read locks in `PROJECT` table too.
+
+* Solution: Delete `SET TRAN ISOLATION LEVEL SERALIZABLE`
 
 
 
