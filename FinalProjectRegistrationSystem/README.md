@@ -282,8 +282,10 @@ Build store procedures to perform requirements.
 
 | T1 - Student reads project information | T2 - Teacher withraws a project |
 | ------------- |:-------------:|
-| col 3 is      | right-aligned | 
-| col 2 is      | centered      |
-
+|(1) Check the project to see if it exists?     |  | 
+| Waitfor delay ‘00:00:05’   | (2) Teacher withraws the project     |
+|(3) Extract information | |
+|Assumption: (1) -> (2) -> (3)|
+|T1 will give different information if he reads twice (Cannot read the information again|
 
 
