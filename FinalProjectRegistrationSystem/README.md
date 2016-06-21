@@ -1,9 +1,7 @@
-# DBMS
-
 >Final project registration system
 
 
-## Tables of contents
+## Table of contents
 1. [Requirements](#requirements)
 2. [System](#system)
 
@@ -60,6 +58,8 @@
 
 ##### Database design
 
+Check the script [here](src/dbscript.sql) for this database 
+
 * Abbreviation
 	* `HINHTHUC`=`TYPE` table: Group or Personal.
 		* `MaHT` = `TypeID` **PK**
@@ -68,6 +68,7 @@
 		* `MaDoAn` = `ProjectID` **PK**
 		* `TenDoAn` = `ProjectName`
 		* `DeadLine`
+		* `YeuCau` = `Requirements`
 		* `MaHT` = `TypeID`
 		* `SoLuongNhomToiDa` = `MaxGroupNumber`
 		* `SoLuongNhomDaDangKy` = `GroupRegistrationNumber`
@@ -106,13 +107,37 @@
 		* `SoLuongNhomToiDaPhuTrachMotDoAn` = `MaxGroupOfaProJect`
 
 * Description
+	* `PROJECT` table includes information about the project. Every project has `ProjectID` to distinguish with other projects. Every project has its name `ProjectName`, along with other information such as `DeadLine`, `Requirements`, `TypeID`, and maximum group number `MaxGroupNumber`.
+
+	* `TYPE` table stores information about how to do this project. We have 
+`TypeID` which means that `Project for groups` or `Personal project`, or `Extra assignment`
+
+	* `PROJECTDETAIL` table shows which teacher is responsible for that project by using `ProjectDetailID`, and `TeacherID`. Many teachers are responsible for one project.
+
+	* `PROJECTREGISTRATION` table includes information of sudents who registered (or groups). Which project did they register `ProjectID`, ID of students `GroupID`, and the day they registered `RegistrationDay`
+
+	* `TEACHER` table shows information of teachers. Every teacher has his own ID `TeacherID` along with other information such as name of teachers `TeacherName`, phone number `PhoneNumber`, and email address `Email`
+
+	* `STUDENT` table is similar to `TEACHER` table
+
+	* `GROUP` shows information of registration groups. If the project is a personal project, group has only one student who is a group leader. There are `GroupID`, `GroupName`, `MemberNumber` How many member are there in the group, `LeaderID` ID of a group leader.
+
+	* `GROUPDETAIL` table shows information of members in a group
+
+	* `RULE` contains rules that set by teachers.
+
 
 * Database diagram
 
 	![DB design](../images/dbdesign.jpg "DB design")
 
+##### Store Procedure
 
+Build store procedures to perform requirements.
 
+* `sp_GVUpdateDA`
+	* Purpose: Teacher wants to update old projects
+	* 
 
 
 

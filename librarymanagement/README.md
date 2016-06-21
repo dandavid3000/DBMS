@@ -1,6 +1,6 @@
 >Library management system.
 
-## Tables of contents
+## Table of contents
 1. [Requirements](#requirements)
 2. [Rules](#rules)
 3. [Database Diagram](database-diagram)
