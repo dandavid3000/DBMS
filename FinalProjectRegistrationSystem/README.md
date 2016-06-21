@@ -677,7 +677,7 @@ Build store procedures to perform requirements.
 ||**(4)** Delete the project `PROJCETREGISTRATION` table|
 ||(Write A)|
 
-* Assumption: **(1)** -> **(2)** -> **(3)** -> **4**
+* Assumption: **(1)** -> **(2)** -> **(3)** -> **(4)**
 * Transaction T1 and T2 will wait for each other to finish `(Cycle Deadlock)`.
 	* `T1 : exec sp_ SVDangKyDA 1,1,2/2/2010`
 	* `T2 : exec sp_ SVHuyDangKyDoAn 1,2`
@@ -704,10 +704,9 @@ Build store procedures to perform requirements.
 |**(3)** Change the max teacher number (Write A) ||
 ||**(4)** Change max group number in a project (Write A) | 
 
-* Assumption: **(1)** -> **(2)** -> **(3)** -> **4**
+* Assumption: **(1)** -> **(2)** -> **(3)** -> **(4)**
 * Transaction T1 and T2 will wait for each other to finish `(Conversion Deadlock)`.
-	* `
-T1 : exec sp_ GVUpdateDA 1,N'Store procedure','9/27/2010',N'nộp đúng quy định',1,1,1,2,1`
+	* `T1 : exec sp_ GVUpdateDA 1,N'Store procedure','9/27/2010',N'nộp đúng quy định',1,1,1,2,1`
 	* `T2 : exec sp_ GVUpdateDA 1,N'Store procedure','9/27/2010',N'nộp đúng quy định',1,2,1,2,1`
 	* Teacher 1 wants to change the max teacher number for a project -> He holds write, and read locks in `PROJECT` table.
 	* Teacher 2 wants to change the max group number for the same project -> He holds write, and read locks in `PROJECT` table too.
