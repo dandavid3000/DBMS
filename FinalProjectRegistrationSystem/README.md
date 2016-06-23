@@ -347,7 +347,7 @@ Build store procedures to perform requirements.
 * A teacher wants to modify information of a project. A student interferes to register. Teacher's transaction has errors and rollbacks. The student read the incorrect information from the teacher.
 * Solution: Make sure that T1 is finished, then T2 will be processed. Use `isolation level READ COMMITTED`.
 
-	```
+	```sql
 	alter proc sp_GVUpdateDA 
 	@Ma_DA int ,@TenDoAn nvarchar(50),@dead_Line datetime , @yeu_cau nvarchar(50),@MaHT int,@SoLuongNhomToiDa int,@SoLuongNhomDaDangKy int,@SoLuongGiaoVienToiDa int ,@SoLuongGiaoVienDaPhuTrach int 
 	as begin
@@ -392,7 +392,7 @@ Build store procedures to perform requirements.
 * Solution: Make sure that `T1 `is completed, then `T2` will be executed. 
 	* Use `isolation level REPEATABLE READ`
 
-	```
+	```sql
 	alter proc sp_GVDocSuaDoAn
 	@Ma_DA int ,@TenDoAn nvarchar(50),@dead_Line datetime , @yeu_cau nvarchar(50),@MaHT int,@SoLuongNhomToiDa int,@SoLuongNhomDaDangKy int,@SoLuongGiaoVienToiDa int ,@SoLuongGiaoVienDaPhuTrach int 
 
@@ -435,7 +435,7 @@ Build store procedures to perform requirements.
 * Solution: Make sure that T1 is completed, then T2 will be executed. The students will register first, The teacher will be allowed to change the max group number afterwards.
 	* We use XLOCK for `PROJECT` table.
 
-	```
+	```sql
 	alter proc sp_GVUpdateDA 
 	@Ma_DA int ,@TenDoAn nvarchar(50),@dead_Line datetime , @yeu_cau nvarchar(50),@MaHT int,@SoLuongNhomToiDa int,@SoLuongNhomDaDangKy int,@SoLuongGiaoVienToiDa int ,@SoLuongGiaoVienDaPhuTrach int 
 	as begin
@@ -480,7 +480,7 @@ Build store procedures to perform requirements.
 * Solution: Make sure T1 is completed. Then T2 will be executed (T2 will not register successfully because the project is full)
 	* Use `isolation level SERIALIZABLE`
 	
-	```
+	```sql
 	alter proc sp_SVDangKyDA
 	@Ma_DA int ,@Ma_Nhom int ,@NgayDangKy datetime
 	as 
@@ -563,7 +563,7 @@ Build store procedures to perform requirements.
 * Solution: Make sure T1 is finished, then T2 will be executed (T2 will not be able to register because max is 2 teachers)
 	* Use `isolation level SERIALIZABLE`
 
-	```
+	```sql
 	alter proc sp_DangKyPhuTrach
 	@Ma_DA int ,@Ma_GV int
 	as 
@@ -632,7 +632,7 @@ Build store procedures to perform requirements.
 * Solution: Make sure T1 is finished, then T2 will be able to read the information.
 	* Use `XLOCK` for `PROJECT` table
 
-	```
+	```sql
 	alter proc sp_SVHuyDangKyDA
 	@Ma_DA int ,@Ma_Nhom int 
 	as 
